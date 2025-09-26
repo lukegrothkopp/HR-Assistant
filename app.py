@@ -84,32 +84,34 @@ def files_fingerprint(paths: List[str]) -> str:
 
 fingerprint = files_fingerprint(pdf_paths)
 
-# -----------------------
-# Build / cache vector store
-# -----------------------
 @st.cache_resource(show_spinner="Indexing documents…")
-def build_retriever(paths: List[str]):
-    # Load & split
+def build_retriever(paths: list[str], cache_key: str):
+    # cache_key is only used so Streamlit’s cache invalidates when files change
+    from pathlib import Path
+    from langchain_community.document_loaders import PyPDFLoader
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    from langchain_openai import OpenAIEmbeddings
+    from langchain_community.vectorstores import Chroma
+
     docs = []
     for p in paths:
+        # defensively skip any non-pdf or missing path
+        if not p.lower().endswith(".pdf") or not Path(p).exists():
+            continue
         loader = PyPDFLoader(p)
         docs.extend(loader.load())
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP
-    )
+
+    if not docs:
+        raise ValueError("No valid PDF pages were loaded.")
+
+    splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
     chunks = splitter.split_documents(docs)
 
-    # Vector store (fresh per upload set)
     embeddings = OpenAIEmbeddings(model=EMBED_MODEL)
-    vectordb = Chroma.from_documents(
-        documents=chunks,
-        embedding=embeddings,             # NOTE: use 'embedding=' here (not embedding_function)
-        persist_directory=None            # in-memory for Cloud sessions
-    )
-    retriever = vectordb.as_retriever(search_kwargs={"k": TOP_K})
-    return retriever
+    vectordb = Chroma.from_documents(documents=chunks, embedding=embeddings)  # note: embedding=
+    return vectordb.as_retriever(search_kwargs={"k": TOP_K})
 
-retriever = build_retriever(pdf_paths + [fingerprint])
+retriever = build_retriever(pdf_paths, fingerprint)
 
 # -----------------------
 # QA Chain
