@@ -19,8 +19,8 @@ from langchain.prompts import ChatPromptTemplate
 # Config & API key loading
 # -----------------------
 st.set_page_config(page_title="AI-Powered HR Assistant", page_icon="🤖", layout="wide")
-st.title("🤖 AI-Powered HR Assistant")
-st.caption("Upload HR policy PDF(s) and ask grounded questions.")
+st.title("🤖 Grothko Consulting HR Assistant")
+st.caption("Self-hosted HR policy chatbot. Ingest PDFs, create embeddings, and query in natural language. Streamlit UI, LangChain retriever, Chroma vector store, OpenAI models. Great for onboarding, quick reference, and compliance FAQs.")
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
