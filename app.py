@@ -113,6 +113,10 @@ def build_retriever(paths: list[str], cache_key: str):
 
 retriever = build_retriever(pdf_paths, fingerprint)
 
+if any(not Path(p).exists() for p in pdf_paths):
+    st.error("Upload failed; please try again.")
+    st.stop()
+
 # -----------------------
 # QA Chain
 # -----------------------
