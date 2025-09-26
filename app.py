@@ -24,28 +24,25 @@ from pathlib import Path
 import streamlit as st
 
 ASSETS = Path(__file__).parent / "assets"
-LOGO = ASSETS / "Grothko_Logo.png"
-
-# Use logo as favicon if present; otherwise fall back to emoji
-page_icon = str(LOGO) if LOGO.exists() else "🤖"
+FAVICON = ASSETS / "favicon.png"       # tab icon
+HEADER_LOGO = ASSETS / "header_logo.png"  # page header logo
 
 st.set_page_config(
     page_title="Grothko Consulting HR Assistant",
-    page_icon=page_icon,
+    page_icon=str(FAVICON) if FAVICON.exists() else "🤖",
     layout="wide"
 )
 
-# Header with logo (no emoji in the title)
-col1, col2 = st.columns([0.12, 0.88])
-with col1:
-    if LOGO.exists():
-        st.image(str(LOGO), width=56)
-with col2:
+# Header
+left, right = st.columns([0.12, 0.88])
+with left:
+    if HEADER_LOGO.exists():
+        st.image(str(HEADER_LOGO), width=64)
+with right:
     st.title("Grothko Consulting HR Assistant")
     st.caption(
         "Self-hosted HR policy chatbot. Ingest PDFs, create embeddings, and query in natural language. "
-        "Streamlit UI, LangChain retriever, Chroma vector store, OpenAI models. Great for onboarding, "
-        "quick reference, and compliance FAQs."
+        "Streamlit UI, LangChain retriever, Chroma vector store, OpenAI models."
     )
 
 load_dotenv()
