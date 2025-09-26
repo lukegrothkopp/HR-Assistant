@@ -1,0 +1,9 @@
+streamlit
+python-dotenv
+langchain>=0.2
+langchain-community>=0.2
+langchain-openai>=0.1
+chromadb
+pypdf
+tiktoken
+openai>=1.51.0
