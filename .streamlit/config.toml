@@ -1,0 +1,7 @@
+[theme]
+base = "dark"                      # "light" or "dark"
+primaryColor = "#4F9DF7"           # accent (buttons, sliders)
+backgroundColor = "#0E1117"        # main bg
+secondaryBackgroundColor = "#1B1F2A"  # sidebar / widgets
+textColor = "#FAFAFA"
+font = "sans serif"                # or "serif" / "monospace"
