@@ -1,1 +1,21 @@
+# secrets & local config
+.env
+*.env
+.streamlit/secrets.toml
+
+# Python/Streamlit cruft
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.cache/
+
+# OS/editor
+.DS_Store
+.vscode/
+
+# App data
+.chroma/
+uploads/
 
