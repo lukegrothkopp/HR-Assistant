@@ -7,6 +7,8 @@ from typing import List
 import streamlit as st
 from dotenv import load_dotenv
 
+
+
 # LangChain / OpenAI wrappers
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.document_loaders import PyPDFLoader
@@ -18,9 +20,33 @@ from langchain.prompts import ChatPromptTemplate
 # -----------------------
 # Config & API key loading
 # -----------------------
-st.set_page_config(page_title="AI-Powered HR Assistant", page_icon="🤖", layout="wide")
-st.title("🤖 Grothko Consulting HR Assistant")
-st.caption("Self-hosted HR policy chatbot. Ingest PDFs, create embeddings, and query in natural language. Streamlit UI, LangChain retriever, Chroma vector store, OpenAI models. Great for onboarding, quick reference, and compliance FAQs.")
+from pathlib import Path
+import streamlit as st
+
+ASSETS = Path(__file__).parent / "assets"
+LOGO = ASSETS / "Grothko_Logo.png"
+
+# Use logo as favicon if present; otherwise fall back to emoji
+page_icon = str(LOGO) if LOGO.exists() else "🤖"
+
+st.set_page_config(
+    page_title="Grothko Consulting HR Assistant",
+    page_icon=page_icon,
+    layout="wide"
+)
+
+# Header with logo (no emoji in the title)
+col1, col2 = st.columns([0.12, 0.88])
+with col1:
+    if LOGO.exists():
+        st.image(str(LOGO), width=56)
+with col2:
+    st.title("Grothko Consulting HR Assistant")
+    st.caption(
+        "Self-hosted HR policy chatbot. Ingest PDFs, create embeddings, and query in natural language. "
+        "Streamlit UI, LangChain retriever, Chroma vector store, OpenAI models. Great for onboarding, "
+        "quick reference, and compliance FAQs."
+    )
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
