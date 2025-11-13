@@ -141,10 +141,15 @@ if any(not Path(p).exists() for p in pdf_paths):
 llm = ChatOpenAI(model=LLM_MODEL, temperature=0)
 
 def answer_with_sources(question: str):
-    # 1) retrieve
-    docs = retriever.get_relevant_documents(question)
+    # 1) retrieve (use the Runnable interface)
+    docs = retriever.invoke(question)
+    
+    if not docs:
+        return "I couldn't find anything in the uploaded HR documents that answers that question."
+    
     # 2) build context
     context = "\n\n---\n\n".join(d.page_content for d in docs)
+
     # 3) call LLM with the prompt
     messages = prompt.format_messages(question=question, context=context)
     ai_msg = llm.invoke(messages)
@@ -157,6 +162,7 @@ def answer_with_sources(question: str):
     if pages:
         answer += "\n\nSources: " + ", ".join(f"p.{p}" for p in pages)
     return answer
+
 
 # -----------------------
 # Ask a question
