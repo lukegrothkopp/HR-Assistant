@@ -141,12 +141,24 @@ if any(not Path(p).exists() for p in pdf_paths):
 llm = ChatOpenAI(model=LLM_MODEL, temperature=0)
 
 def answer_with_sources(question: str):
-    # 1) retrieve (use the Runnable interface)
-    docs = retriever.invoke(question)
-    
+    # 1) retrieve – handle both "new" and "old" retriever APIs
+    if hasattr(retriever, "invoke"):
+        try:
+            docs = retriever.invoke(question)
+        except TypeError:
+            # some Runnable retrievers expect a dict input
+            docs = retriever.invoke({"input": question})
+    elif hasattr(retriever, "get_relevant_documents"):
+        docs = retriever.get_relevant_documents(question)
+    else:
+        raise RuntimeError(
+            "Retriever does not support 'invoke' or 'get_relevant_documents'. "
+            "Check your LangChain versions."
+        )
+
     if not docs:
         return "I couldn't find anything in the uploaded HR documents that answers that question."
-    
+
     # 2) build context
     context = "\n\n---\n\n".join(d.page_content for d in docs)
 
@@ -162,7 +174,6 @@ def answer_with_sources(question: str):
     if pages:
         answer += "\n\nSources: " + ", ".join(f"p.{p}" for p in pages)
     return answer
-
 
 # -----------------------
 # Ask a question
