@@ -140,6 +140,8 @@ def build_retriever(paths: List[str], cache_key: str):
 
     return vectordb.as_retriever(search_kwargs={"k": TOP_K})
 
+retriever = build_retriever(pdf_paths, fingerprint)
+
 # -----------------------
 # Minimal “manual” QA (no helper imports)
 # -----------------------
