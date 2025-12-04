@@ -126,14 +126,19 @@ def build_retriever(paths: List[str], cache_key: str):
     chunks = splitter.split_documents(docs)
 
     embeddings = _Emb(model=EMBED_MODEL)
-    vectordb = _Chroma.from_documents(documents=chunks, embedding=embeddings)
+
+    # 🔧 IMPORTANT: force Chroma to use a fresh, writable directory in /tmp
+    persist_dir = _Path("/tmp") / "chroma_hr_assistant" / cache_key
+    persist_dir.mkdir(parents=True, exist_ok=True)
+
+    vectordb = _Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        persist_directory=str(persist_dir),
+        collection_name=f"hr_docs_{cache_key}",
+    )
+
     return vectordb.as_retriever(search_kwargs={"k": TOP_K})
-
-retriever = build_retriever(pdf_paths, fingerprint)
-
-if any(not Path(p).exists() for p in pdf_paths):
-    st.error("Upload failed; please try again.")
-    st.stop()
 
 # -----------------------
 # Minimal “manual” QA (no helper imports)
